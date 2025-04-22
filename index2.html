@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Rekod Fail JKB</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>Rekod Fail Jabatan Kawalan Bangunan</h2>
+
+<div class="form-control">
+  <input type="text" id="nama" placeholder="Nama Pemilik">
+  <input type="text" id="nofail" placeholder="No Fail">
+  <input type="text" id="pps" placeholder="Nama PPS">
+  <input type="text" id="status" placeholder="Status">
+  <input type="text" id="lokasi" placeholder="Keberadaan Fail">
+  <input type="text" id="catatan" placeholder="Catatan">
+  <button onclick="addData()">Tambah</button>
+</div>
+
+<div class="search-box">
+  <input type="text" id="search" placeholder="Cari Nama atau No Fail" onkeyup="searchData()">
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Nama Pemilik</th>
+      <th>No Fail</th>
+      <th>Nama PPS</th>
+      <th>Status</th>
+      <th>Keberadaan Fail</th>
+      <th>Catatan</th>
+      <th>Tindakan</th>
+    </tr>
+  </thead>
+  <tbody id="dataList"></tbody>
+</table>
+
+<script>
+  let data = JSON.parse(localStorage.getItem("Data")) || [];
+
+  function renderData(filter = "") {
+    const list = document.getElementById("dataList");
+    list.innerHTML = "";
+    data.forEach((item, index) => {
+      if (
+        item.nama.toLowerCase().includes(filter) ||
+        item.nofail.toLowerCase().includes(filter)
+      ) {
+        list.innerHTML += `
+        <tr>
+          <td>${item.nama}</td>
+          <td>${item.nofail}</td>
+          <td>${item.pps}</td>
+          <td>${item.status}</td>
+          <td>${item.lokasi}</td>
+          <td>${item.catatan}</td>
+          <td>
+            <button onclick="editData(${index})">Edit</button>
+            <button onclick="deleteData(${index})">Padam</button>
+          </td>
+        </tr>`;
+      }
+    });
+  }
+
+  function addData() {
+    const nama = document.getElementById("nama").value;
+    const nofail = document.getElementById("nofail").value;
+    const pps = document.getElementById("pps").value;
+    const status = document.getElementById("status").value;
+    const lokasi = document.getElementById("lokasi").value;
+    const catatan = document.getElementById("catatan").value;
+
+    if (nama && nofail && pps && status && lokasi && catatan) {
+      data.push({ nama, nofail, pps, status, lokasi, catatan });
+      localStorage.setItem("Data", JSON.stringify(data));
+      clearForm();
+      renderData();
+    }
+  }
+
+  function clearForm() {
+    document.getElementById("nama").value = "";
+    document.getElementById("nofail").value = "";
+    document.getElementById("pps").value = "";
+    document.getElementById("status").value = "";
+    document.getElementById("lokasi").value = "";
+    document.getElementById("catatan").value = "";
+  }
+
+  function editData(index) {
+    const item = data[index];
+    const nama = prompt("Nama Pemilik:", item.nama);
+    const nofail = prompt("No Fail:", item.nofail);
+    const pps = prompt("Nama PPS:", item.pps);
+    const status = prompt("Status:", item.status);
+    const lokasi = prompt("Keberadaan Fail:", item.lokasi);
+    const catatan = prompt("Catatan:", item.catatan);
+
+    if (nama && nofail && pps && status && lokasi && catatan) {
+      data[index] = { nama, nofail, pps, status, lokasi, catatan };
+      localStorage.setItem("Data", JSON.stringify(data));
+      renderData();
+    }
+  }
+
+  function deleteData(index) {
+    if (confirm("Padam rekod ini?")) {
+      data.splice(index, 1);
+      localStorage.setItem("Data", JSON.stringify(data));
+      renderData();
+    }
+  }
+
+  function searchData() {
+    const keyword = document.getElementById("search").value.toLowerCase();
+    renderData(keyword);
+  }
+
+  renderData();
+</script>
+
+</body>
+</html>
